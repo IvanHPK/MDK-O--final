@@ -1,0 +1,226 @@
+{% extends 'delivery_service/base.html' %}
+
+{% block title %}Создать заказ{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+
+            <div class="card-header bg-primary text-white">
+                <h1 class="h4 mb-0">
+                    <i class="bi bi-plus-circle"></i> Создать заказ
+                </h1>
+            </div>
+
+            <div class="card-body">
+
+                {% if form.errors or errors %}
+                    <div class="alert alert-danger">
+                        {{ form.errors }}
+
+                        {% for error in errors.values %}
+                            <p class="mb-1">{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                <form method="post">
+                    {% csrf_token %}
+
+                    <div class="row">
+
+                        <div class="col-md-6 mb-3">
+                            <label for="id_client" class="form-label">
+                                Клиент
+                            </label>
+
+                            <select class="form-select"
+                                    id="id_client"
+                                    name="client"
+                                    required>
+
+                                <option value="">— выберите —</option>
+
+                                {% for client in clients %}
+                                    <option value="{{ client.pk }}"
+                                            {% if values.client == client.pk|stringformat:'s' %}selected{% endif %}>
+                                        {{ client }}
+                                    </option>
+                                {% endfor %}
+
+                            </select>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label for="id_curier" class="form-label">
+                                Курьер
+                            </label>
+
+                            <select class="form-select"
+                                    id="id_curier"
+                                    name="curier">
+
+                                <option value="">Не назначен</option>
+
+                                {% for courier in couriers %}
+                                    <option value="{{ courier.pk }}"
+                                            {% if values.curier == courier.pk|stringformat:'s' %}selected{% endif %}>
+                                        {{ courier }}
+                                    </option>
+                                {% endfor %}
+
+                            </select>
+                        </div>
+
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="id_address_otpravki" class="form-label">
+                            Адрес отправки
+                        </label>
+
+                        <input type="text"
+                               class="form-control"
+                               id="id_address_otpravki"
+                               name="address_otpravki"
+                               maxlength="255"
+                               value="{{ values.address_otpravki }}"
+                               required>
+                    </div>
+
+                    <h2 class="h5">Адрес доставки</h2>
+
+                    <div class="row">
+
+                        <div class="col-md-6 mb-3">
+                            <label for="id_gorod" class="form-label">
+                                Город
+                            </label>
+
+                            <input type="text"
+                                   class="form-control"
+                                   id="id_gorod"
+                                   name="gorod"
+                                   maxlength="100"
+                                   value="{{ values.gorod }}"
+                                   required>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label for="id_ulica" class="form-label">
+                                Улица
+                            </label>
+
+                            <input type="text"
+                                   class="form-control"
+                                   id="id_ulica"
+                                   name="ulica"
+                                   maxlength="150"
+                                   value="{{ values.ulica }}"
+                                   required>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label for="id_house" class="form-label">
+                                Дом
+                            </label>
+
+                            <input type="text"
+                                   class="form-control"
+                                   id="id_house"
+                                   name="house"
+                                   maxlength="20"
+                                   value="{{ values.house }}"
+                                   required>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label for="id_apartamen" class="form-label">
+                                Квартира
+                            </label>
+
+                            <input type="text"
+                                   class="form-control"
+                                   id="id_apartamen"
+                                   name="apartamen"
+                                   maxlength="10"
+                                   value="{{ values.apartamen }}">
+                        </div>
+
+                    </div>
+
+                    <div class="row">
+
+                        <div class="col-md-6 mb-3">
+                            <label for="id_ves" class="form-label">
+                                Вес, кг
+                            </label>
+
+                            <input type="number"
+                                   class="form-control"
+                                   id="id_ves"
+                                   name="ves"
+                                   min="0.01"
+                                   max="99999.99"
+                                   step="0.01"
+                                   value="{{ values.ves }}"
+                                   required>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label for="id_summa" class="form-label">
+                                Сумма, ₽
+                            </label>
+
+                            <input type="number"
+                                   class="form-control"
+                                   id="id_summa"
+                                   name="summa"
+                                   min="0.01"
+                                   max="99999999.99"
+                                   step="0.01"
+                                   value="{{ values.summa }}"
+                                   required>
+                        </div>
+
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="id_zakaz_status" class="form-label">
+                            Статус заказа
+                        </label>
+
+                        <select class="form-select"
+                                id="id_zakaz_status"
+                                name="zakaz_status"
+                                required>
+
+                            <option value="">— выберите —</option>
+
+                            {% for status in statuses %}
+                                <option value="{{ status.pk }}"
+                                        {% if values.zakaz_status == status.pk|stringformat:'s' %}selected{% endif %}>
+                                    {{ status }}
+                                </option>
+                            {% endfor %}
+
+                        </select>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-check-circle"></i> Сохранить
+                    </button>
+
+                    <a href="{% url 'delivery_service:order_list' %}"
+                       class="btn btn-secondary">
+                        Отмена
+                    </a>
+
+                </form>
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endblock %}

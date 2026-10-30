@@ -1,0 +1,218 @@
+{% extends 'delivery_service/base.html' %}
+{% load delivery_tags %}
+
+{% block title %}Заказы{% endblock %}
+
+{% block content %}
+<div class="row">
+
+    <div class="col-md-8">
+        <h1>Заказы</h1>
+
+        <p class="lead">
+            Всего заказов: {% total_orders %}.
+            Найдено: {{ paginator.count }}.
+        </p>
+
+        <form method="get" class="mb-4">
+            <div class="row">
+
+                <div class="col-md-6 mb-3">
+                    <label for="q" class="form-label">
+                        ФИО клиента
+                    </label>
+
+                    <input type="text"
+                           class="form-control"
+                           id="q"
+                           name="q"
+                           value="{{ search_query }}">
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label for="status" class="form-label">
+                        Статус заказа
+                    </label>
+
+                    <select class="form-select" id="status" name="status">
+                        <option value="">Все статусы</option>
+
+                        {% for status in statuses %}
+                            <option value="{{ status.name }}"
+                                    {% if selected_status == status.name %}selected{% endif %}>
+                                {{ status }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+            </div>
+
+            <div class="form-check mb-3">
+                <input type="checkbox"
+                       class="form-check-input"
+                       id="unassigned"
+                       name="unassigned"
+                       {% if unassigned == 'on' %}checked{% endif %}>
+
+                <label class="form-check-label" for="unassigned">
+                    Без назначенного курьера
+                </label>
+            </div>
+
+            <button type="submit" class="btn btn-primary">
+                Найти
+            </button>
+
+            <a href="{% url 'delivery_service:order_list' %}"
+               class="btn btn-secondary">
+                Сбросить
+            </a>
+        </form>
+
+        <div class="row">
+            {% for order in orders %}
+
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100">
+
+                        <div class="card-body">
+                            <h5 class="card-title">
+                                Заказ №{{ order.pk }}
+                            </h5>
+
+                            <p>
+                                {{ order.client|default:"Клиент не указан" }}
+                            </p>
+
+                            <p class="text-muted">
+                                {{ order.zakaz_status|default:"Статус не указан" }}
+                            </p>
+
+                            <p>
+                                <strong>
+                                    {{ order.summa|currency|default:"—" }}
+                                </strong>
+                            </p>
+                        </div>
+
+                        <div class="card-footer">
+                            <button type="button"
+                                    class="btn btn-outline-secondary btn-sm mb-1"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#modal{{ order.pk }}">
+                                Просмотр
+                            </button>
+
+                            <a href="{% url 'delivery_service:order_detail' order.pk %}"
+                               class="btn btn-primary btn-sm mb-1">
+                                Подробнее
+                            </a>
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="modal fade"
+                     id="modal{{ order.pk }}"
+                     tabindex="-1">
+
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+
+                            <div class="modal-header bg-primary text-white">
+                                <h5 class="modal-title">
+                                    Заказ №{{ order.pk }}
+                                </h5>
+
+                                <button type="button"
+                                        class="btn-close btn-close-white"
+                                        data-bs-dismiss="modal"
+                                        aria-label="Закрыть">
+                                </button>
+                            </div>
+
+                            <div class="modal-body">
+                                <p>
+                                    <strong>Клиент:</strong>
+                                    {{ order.client|default:"Не указан" }}
+                                </p>
+
+                                <p>
+                                    <strong>Курьер:</strong>
+                                    {{ order.curier|default:"Не назначен" }}
+                                </p>
+
+                                <p>
+                                    <strong>Доставка:</strong>
+                                    {{ order.address_dostavki|default:"Не указан" }}
+                                </p>
+
+                                <p>
+                                    <strong>Сумма:</strong>
+                                    {{ order.summa|currency|default:"—" }}
+                                </p>
+                            </div>
+
+                            <div class="modal-footer">
+                                <a href="{% url 'delivery_service:order_detail' order.pk %}"
+                                   class="btn btn-primary">
+                                    Открыть карточку
+                                </a>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+            {% empty %}
+                <div class="col-12">
+                    <div class="alert alert-info">
+                        Ничего не найдено.
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
+        {% if is_paginated %}
+            <nav aria-label="Страницы заказов">
+                <ul class="pagination justify-content-center">
+
+                    {% if page_obj.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link"
+                               href="?page={{ page_obj.previous_page_number }}&amp;q={{ search_query }}&amp;status={{ selected_status }}&amp;unassigned={{ unassigned }}">
+                                Назад
+                            </a>
+                        </li>
+                    {% endif %}
+
+                    <li class="page-item active">
+                        <span class="page-link">
+                            {{ page_obj.number }}
+                            из
+                            {{ page_obj.paginator.num_pages }}
+                        </span>
+                    </li>
+
+                    {% if page_obj.has_next %}
+                        <li class="page-item">
+                            <a class="page-link"
+                               href="?page={{ page_obj.next_page_number }}&amp;q={{ search_query }}&amp;status={{ selected_status }}&amp;unassigned={{ unassigned }}">
+                                Вперёд
+                            </a>
+                        </li>
+                    {% endif %}
+
+                </ul>
+            </nav>
+        {% endif %}
+
+    </div>
+
+    <div class="col-md-4">
+        {% show_top_couriers 5 %}
+    </div>
+
+</div>
+{% endblock %}

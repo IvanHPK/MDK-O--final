@@ -1,0 +1,109 @@
+{% extends 'delivery_service/base.html' %}
+{% load delivery_tags %}
+
+{% block title %}Заказ №{{ order.pk }}{% endblock %}
+
+{% block content %}
+
+<nav aria-label="Навигация">
+    <ol class="breadcrumb">
+
+        <li class="breadcrumb-item">
+            <a href="{% url 'delivery_service:home' %}">
+                Главная
+            </a>
+        </li>
+
+        <li class="breadcrumb-item">
+            <a href="{% url 'delivery_service:order_list' %}">
+                Заказы
+            </a>
+        </li>
+
+        <li class="breadcrumb-item active">
+            Заказ №{{ order.pk }}
+        </li>
+
+    </ol>
+</nav>
+
+<div class="card mb-4">
+    <div class="card-header bg-primary text-white">
+        <h1 class="h4 mb-0">
+            Заказ №{{ order.pk }}
+        </h1>
+    </div>
+
+    <div class="card-body">
+        <p>
+            <strong>Клиент:</strong>
+            {{ order.client|default:"Не указан" }}
+        </p>
+
+        <p>
+            <strong>Телефон клиента:</strong>
+            {{ order.client.phone|default:"Не указан" }}
+        </p>
+
+        <p>
+            <strong>Курьер:</strong>
+            {{ order.curier|default:"Не назначен" }}
+        </p>
+
+        <p>
+            <strong>Адрес отправки:</strong>
+            {{ order.address_otpravki|default:"Не указан" }}
+        </p>
+
+        <p>
+            <strong>Адрес доставки:</strong>
+            {{ order.address_dostavki|default:"Не указан" }}
+        </p>
+
+        <p>
+            <strong>Вес, кг:</strong>
+            {{ order.ves|default:"—" }}
+        </p>
+
+        <p>
+            <strong>Сумма:</strong>
+            {{ order.summa|currency|default:"—" }}
+        </p>
+
+        <p>
+            <strong>Статус:</strong>
+            {{ order.zakaz_status|default:"Не указан" }}
+        </p>
+
+        <a href="{% url 'delivery_service:order_list' %}"
+           class="btn btn-secondary">
+            К списку заказов
+        </a>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        Другие заказы этого клиента
+    </div>
+
+    <div class="card-body">
+        {% if order.client and order.client.zakaz_set.all|length > 1 %}
+            <ul class="mb-0">
+                {% for other in order.client.zakaz_set.all %}
+                    {% if other.pk != order.pk %}
+                        <li>
+                            <a href="{% url 'delivery_service:order_detail' other.pk %}">
+                                Заказ №{{ other.pk }}
+                            </a>
+                        </li>
+                    {% endif %}
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p class="mb-0">Других заказов нет.</p>
+        {% endif %}
+    </div>
+</div>
+
+{% endblock %}

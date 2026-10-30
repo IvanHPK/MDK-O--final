@@ -1,0 +1,29 @@
+<div class="card">
+
+    <div class="card-header bg-warning">
+        <h5 class="mb-0">
+            Курьеры по количеству заказов
+        </h5>
+    </div>
+
+    <ul class="list-group list-group-flush">
+
+        {% for courier in couriers %}
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+
+                <span>{{ courier }}</span>
+
+                <span class="badge bg-primary rounded-pill">
+                    {{ courier.order_count }}
+                </span>
+
+            </li>
+        {% empty %}
+            <li class="list-group-item text-muted">
+                Нет данных
+            </li>
+        {% endfor %}
+
+    </ul>
+
+</div>

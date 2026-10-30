@@ -1,0 +1,64 @@
+{% extends 'delivery_service/base.html' %}
+{% load delivery_tags %}
+
+{% block title %}Главная{% endblock %}
+
+{% block content %}
+<h1>Служба доставки</h1>
+
+<p class="lead">
+    Всего заказов: {% total_orders %}.
+</p>
+
+<a href="{% url 'delivery_service:order_create' %}"
+   class="btn btn-primary mb-4">
+    Создать заказ
+</a>
+
+<div class="row">
+
+    <div class="col-md-8">
+        <h2 class="h4">Последние заказы</h2>
+
+        <div class="row">
+            {% for order in orders %}
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100">
+
+                        <div class="card-body">
+                            <h5 class="card-title">
+                                Заказ №{{ order.pk }}
+                            </h5>
+
+                            <p>
+                                {{ order.client|default:"Клиент не указан" }}
+                            </p>
+
+                            <p>
+                                <strong>
+                                    {{ order.summa|currency|default:"—" }}
+                                </strong>
+                            </p>
+                        </div>
+
+                        <div class="card-footer">
+                            <a href="{% url 'delivery_service:order_detail' order.pk %}"
+                               class="btn btn-primary btn-sm">
+                                Подробнее
+                            </a>
+                        </div>
+
+                    </div>
+                </div>
+            {% empty %}
+                <p>Заказов пока нет.</p>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        {% show_top_couriers 3 %}
+    </div>
+
+</div>
+{% endblock %}
