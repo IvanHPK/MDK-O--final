@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Работа с заказами</title>
+</head>
+<body>
+
+<h1>Работа с заказами</h1>
+
+{% if error %}
+    <p>{{ error }}</p>
+{% endif %}
+
+{% if not db_error %}
+<form method="GET">
+    <p>
+        Выберите заказчика
+        <select name="filter">
+            <option value="">Выберите заказчика</option>
+            {% for customer in customers %}
+                <option value="{{ customer.id }}"
+                    {% if filter == customer.id %}selected{% endif %}>
+                    {{ customer.name }}
+                </option>
+            {% endfor %}
+        </select>
+        <button type="submit" name="apply_filter" value="1">Фильтровать</button>
+        <button type="submit" name="reset" value="1">Показать все</button>
+    </p>
+
+    <p>
+        Введите строку поиска
+        <input type="text" name="search" value="{{ search }}">
+        <button type="submit" name="find" value="1">Найти</button>
+    </p>
+
+    <p>
+        Выберите поле для сортировки
+        <select name="field" size="3">
+            <option value="customer"
+                {% if field == 'customer' %}selected{% endif %}>Заказчик</option>
+            <option value="date"
+                {% if field == 'date' %}selected{% endif %}>Дата заказа</option>
+            <option value="amount"
+                {% if field == 'amount' %}selected{% endif %}>Сумма заказа</option>
+        </select>
+
+        <label>
+            <input type="radio" name="sort" value="asc"
+                {% if sort != 'desc' %}checked{% endif %}>
+            По возрастанию
+        </label>
+        <label>
+            <input type="radio" name="sort" value="desc"
+                {% if sort == 'desc' %}checked{% endif %}>
+            По убыванию
+        </label>
+        <button type="submit">Сортировать</button>
+    </p>
+</form>
+
+<table border="1">
+    <thead>
+        <tr>
+            <th>Заказчик</th>
+            <th>Город</th>
+            <th>Телефон</th>
+            <th>Дата заказа</th>
+            <th>Сумма заказа</th>
+        </tr>
+    </thead>
+
+    <tbody>
+    {% for order in orders %}
+        <tr>
+            <td {% if search and order in names %}bgcolor="yellow"{% endif %}>
+                {{ order.zakazchik.name|default:"—" }}
+            </td>
+            <td {% if search and order in cities %}bgcolor="yellow"{% endif %}>
+                {{ order.zakazchik.adres|default:"—" }}
+            </td>
+            <td {% if search and order in phones %}bgcolor="yellow"{% endif %}>
+                {{ order.zakazchik.phone|default:"—" }}
+            </td>
+            <td {% if search and order in dates %}bgcolor="yellow"{% endif %}>
+                {{ order.data_zakaza|date:"d.m.Y" }}
+            </td>
+            <td {% if search and order in amounts %}bgcolor="yellow"{% endif %}>
+                {{ order.summa_zakaza|floatformat:"2" }}
+            </td>
+        </tr>
+    {% empty %}
+        <tr><td colspan="5">Заказов нет</td></tr>
+    {% endfor %}
+    </tbody>
+</table>
+
+<p>Всего заказов: {{ orders|length }}</p>
+<p>Общая сумма: {{ total|floatformat:"2" }}</p>
+{% endif %}
+
+</body>
+</html>
